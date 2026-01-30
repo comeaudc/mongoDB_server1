@@ -1,11 +1,11 @@
-export const logReq = (req, res, next) => {
+export const logReq = (req, _res, next) => {
   console.log(
-    `${req.method} -- ${req.url} == ${new Date().toLocaleDateString()}`,
+    `${req.method} -- ${req.url} -- ${new Date().toLocaleDateString()}`,
   );
 
   next();
 }
 
-export const globalErr = (err, req, res, next) => {
+export const globalErr = (err, _req, res, _next) => {
   res.status(err.status || 500).json({ error: `❌ Error: ${err.message}` });
 }
