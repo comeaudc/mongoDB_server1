@@ -17,14 +17,14 @@ try {
 
   db = conn.db("sample_training");
 
-  await createCollectionSetup();
+  await createIndexSetup();
   await createGradesSchema();
 } catch (error) {
   console.error(error);
   process.exit(1);
 }
 
-async function createCollectionSetup() {
+async function createIndexSetup() {
   const grades = db.collection("grades");
 
   await grades.createIndex({ learner_id: -1 });
