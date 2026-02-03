@@ -23,3 +23,7 @@ app.use(globalErr);
 app.listen(PORT, () => {
   console.log(`Server listening on PORT: ${PORT}`);
 });
+
+// Index - table of contents for quick lookup of data.
+// advantage - faster READ time, faster queries
+// disadvantage - slower WRITE time
