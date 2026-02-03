@@ -4,6 +4,122 @@ import db from "../db/conn.js";
 
 const router = express.Router();
 
+router.get("/agg", async (req, res) => {
+  let collection = db.collection("grades");
+
+  let result = await collection
+    .aggregate([
+      {
+        $project: {
+          _id: 0,
+          class_id: 1,
+          learner_id: 1,
+          avg: {
+            $avg: "$scores.score",
+          },
+        },
+      },
+    ])
+    .toArray();
+
+  console.log(result);
+
+  res.json(result);
+});
+
+router.get("/learner/:id/avg", async (req, res) => {
+  let collection = db.collection("grades");
+
+  let results = await collection
+    .aggregate([
+      {
+        $match: {
+          learner_id: Number(req.params.id),
+        },
+      },
+      {
+        $unwind: {
+          path: "$scores",
+        },
+      },
+      {
+        $group: {
+          _id: "$class_id",
+          quiz: {
+            $push: {
+              $cond: {
+                if: {
+                  $eq: ["$scores.type", "quiz"],
+                },
+                then: "$scores.score",
+                else: "$$REMOVE",
+              },
+            },
+          },
+          exam: {
+            $push: {
+              $cond: {
+                if: {
+                  $eq: ["$scores.type", "exam"],
+                },
+                then: "$scores.score",
+                else: "$$REMOVE",
+              },
+            },
+          },
+          homework: {
+            $push: {
+              $cond: {
+                if: {
+                  $eq: ["$scores.type", "homework"],
+                },
+                then: "$scores.score",
+                else: "$$REMOVE",
+              },
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          class_id: "$_id",
+          avg: {
+            $sum: [
+              {
+                $multiply: [
+                  {
+                    $avg: "$exam",
+                  },
+                  0.5,
+                ],
+              },
+              {
+                $multiply: [
+                  {
+                    $avg: "$quiz",
+                  },
+                  0.3,
+                ],
+              },
+              {
+                $multiply: [
+                  {
+                    $avg: "$homework",
+                  },
+                  0.2,
+                ],
+              },
+            ],
+          },
+        },
+      },
+    ])
+    .toArray();
+
+  res.json(results);
+});
+
 // Create new entries
 router.post("/", async (req, res) => {
   let newDoc = req.body;
