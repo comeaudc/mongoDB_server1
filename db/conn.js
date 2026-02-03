@@ -42,6 +42,7 @@ async function createGradesSchema() {
         properties: {
           learner_id: {
             bsonType: "int",
+            description: "'Learner_id - must be a number type"
           },
           class_id: {
             bsonType: "int",

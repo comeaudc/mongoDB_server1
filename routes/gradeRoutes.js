@@ -137,7 +137,7 @@ router.post("/", async (req, res) => {
   console.log(results);
 
   // Return Results
-  res.status(204).json(results);
+  res.json(results);
 });
 
 // GET by learner_id and class_id
